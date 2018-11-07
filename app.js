@@ -1,11 +1,12 @@
-// page variables
-var width = svgWidth - margin.left - margin.right;
-var height = svgHeight - margin.top - margin.bottom;
 var svgWidth = 900;
 var svgHeight = 440;
+
 var margin = { top: 20, right: 40, bottom: 60, left: 100 };
 
+var width = svgWidth - margin.left - margin.right;
+var height = svgHeight - margin.top - margin.bottom;
 
+// Create an SVG wrapper, append an SVG group that will hold our chart, and shift the latter by left and top margins.
 var svg = d3.select("#scatter")
   .append("svg")
   .attr("width", svgWidth)
@@ -15,8 +16,7 @@ var svg = d3.select("#scatter")
 
 var chart = svg.append("g");
 
-// Append a div to the body for tooltips creation
-// Assign class
+// Append a div to the body to create tooltips, assign it a class
 d3.select("#scatter")
   .append("div")
   .attr("class", "tooltip")
@@ -25,25 +25,25 @@ d3.select("#scatter")
 d3.csv("data.csv", function(err, cdcData) {
   if (err) throw err;
 
-
+// convert the integers to strings?
   cdcData.forEach(function(data) {
     data.poverty = +data.poverty;
     data.healthcare = +data.healthcare;
   });
 
 
-  // VAriables for scale functions
+  // Create scale functions
   var yLinearScale = d3.scaleLinear()
     .range([height, 0]);
 
   var xLinearScale = d3.scaleLinear()
     .range([0, width]);
 
-  // Variables for axis functions
+  // Create axis functions
   var bottomAxis = d3.axisBottom(xLinearScale);
   var leftAxis = d3.axisLeft(yLinearScale);
 
-  // Scale Domain
+  // Scale the domain
   xLinearScale.domain([8, d3.max(cdcData, function(data) {
     return +data.poverty *1.1;
   })]);
@@ -53,6 +53,7 @@ d3.csv("data.csv", function(err, cdcData) {
 
   var toolTip = d3.tip()
     .attr("class", "tooltip")
+    // .offset([80, -60])
     .html(function(data) {
       var state = data.abbr;
       var poverty = +data.poverty;
@@ -81,13 +82,13 @@ d3.csv("data.csv", function(err, cdcData) {
         toolTip.hide(data);
       });
 
-  // State Abbreviations
+  // add the state abbreviations
   chart.selectAll("text")
       .data(cdcData)
       .enter().append("text")
         .attr("x", function(data){
           console.log(xLinearScale(data.poverty));
-          return xLinearScale(data.poverty)-7; 
+          return xLinearScale(data.poverty)-7;  //move them to the center of the circle
         })
         .attr("y", function(data){
           return yLinearScale(data.healthcare)+4  ;
@@ -96,9 +97,11 @@ d3.csv("data.csv", function(err, cdcData) {
           return data.abbr;
         })
         .attr("class", "circleText")
+        // add listeners on text too since it is on top of circle
         .on("mouseover", function(data) {
           toolTip.show(data);
         })
+        // onmouseout event
         .on("mouseout", function(data, index) {
           toolTip.hide(data);
         });
