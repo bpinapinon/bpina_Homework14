@@ -16,13 +16,15 @@ var svg = d3.select("#scatter")
 
 var chart = svg.append("g");
 
-// Append a div to the body to create tooltips, assign it a class
+
 d3.select("#scatter")
   .append("div")
   .attr("class", "tooltip")
   .style("opacity", 0);
 
-d3.csv("data.csv", function(err, cdcData) {
+// d3.csv("data.csv").then(function(err, cdcData) {
+  d3.csv("data.csv" ,function(err, cdcData) {
+    console.log(cdcData)
   if (err) throw err;
 
 // convert the integers to strings?
